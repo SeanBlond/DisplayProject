@@ -1,8 +1,10 @@
 ﻿from PIL import Image, ImageDraw, ImageFont
 from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
+from dotenv import load_dotenv
 import requests
 import sys
+import os
 
 # Trying to import inky stuff
 try:
@@ -23,13 +25,16 @@ except IOError:
     small_lato_font_regular = ImageFont.load_default()
     symbol_font = ImageFont.load_default()
 
+# Getting weather api ket
+load_dotenv()
+WEATHER_API_KEY = os.getenv("MET_WEATHER_KEY")
 
 def DrawWeatherGraph(startingYPos):
 
     # Defining information for requesting data
     BASE_URL = "https://data.hub.api.metoffice.gov.uk/sitespecific/v0/point/hourly"
     HEADERS = {
-        "apikey" : open('api_key', 'r').read(),
+        "apikey" : WEATHER_API_KEY,
         "accept" : "applications"
     }
     PARAMS = {
@@ -226,10 +231,17 @@ DrawWeatherGraph(800)
 # Saving the image
 image.save("testImage.png")
 
-# Saving & showing the image
+#Inky stuff
 try:
+    #Creating the inky display object
     inky_display = auto(ask_user=True, verbose=True)
-    inky_display.set_image(image)
+
+    #Rotating the image to fit the display
+    inkyImage = Image.new("P", (inky_display.width, inky_display.height), inky_display.WHITE)
+    rotImage = image.rotate(90, expand=True)
+
+    # Sending the rotated image to the inky display
+    inky_display.set_image(rotImage)
     inky_display.show()
 except:
     print("Failed to run inky functions")

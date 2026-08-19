@@ -1,3 +1,4 @@
 api_key
 /.vs
 readout
+.env
