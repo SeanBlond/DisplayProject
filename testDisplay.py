@@ -1,5 +1,5 @@
 ﻿from PIL import Image, ImageDraw, ImageFont
-from datetime import datetime
+from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 import requests
 import sys
@@ -134,7 +134,9 @@ except IOError:
     symbol_font = ImageFont.load_default()
 
 # Getting the current date and allowed tomorrow date
-dundeeTime = datetime.now(ZoneInfo("Europe/London"))
+dundeeTime = datetime.now(ZoneInfo("Europe/London")) + timedelta(days=1)
+allowedFutureDate = dundeeTime + timedelta(days=1)
+allowedFutureDate = allowedFutureDate.replace(hour=0)
 
 # Defining members for keeping track of temp data for the graph
 maxGraphTemp = max(timeSeriesList[0]["screenTemperature"], timeSeriesList[0]["feelsLikeTemperature"])
@@ -150,24 +152,26 @@ for entry in timeSeriesList:
     # Getting time data
     dateTimeObject = datetime.strptime(entry["time"], "%Y-%m-%dT%H:%S%z")
 
-    # If the date doesn't equal the current date, skip
-    if (dateTimeObject.date() != dundeeTime.date()):
+    # If the date doesn't equal the current date, skip (except for allowed future date)
+    if (dateTimeObject.date() != dundeeTime.date() and 
+        (dateTimeObject.date() != allowedFutureDate.date() or
+        dateTimeObject.hour != allowedFutureDate.hour)):
         continue
 
     # Calculating time
-    timeString = dateTimeObject.strftime("%#H").lower()
+    timeString = dateTimeObject.strftime("%#I%p").lower()
 
     # Only draw the data if the hour is even
     if (dateTimeObject.hour % 2 == 0):
         # Drawing time
-        draw.text(((index + 0.5) * 61.5, 395), timeString, fill=(0, 0, 0), font=lato_font_bold, anchor="mb")
+        draw.text(((index + 0.5) * 61.5, 390), timeString, fill=(0, 0, 0), font=lato_font_bold, anchor="ms")
 
         # Drawing weather condition symbol
-        draw.text(((index + 0.5) * 61.5, 430), WEATHER_CODE_SYMBOLS[entry["significantWeatherCode"]], fill=(0, 0, 0), font=symbol_font, anchor="mb")
+        draw.text(((index + 0.5) * 61.5, 430), WEATHER_CODE_SYMBOLS[entry["significantWeatherCode"]], fill=(0, 0, 0), font=symbol_font, anchor="ms")
 
         # Drawing temps
-        draw.text(((index + 0.5) * 61.5, 450), str(round(entry["screenTemperature"], 1)), fill=(0, 0, 0), font=lato_font_bold, anchor="mb")
-        draw.text(((index + 0.5) * 61.5, 475), str(round(entry["feelsLikeTemperature"], 1)), fill=(100, 100, 100), font=lato_font_regular, anchor="mb")
+        draw.text(((index + 0.5) * 61.5, 450), str(round(entry["screenTemperature"], 1)), fill=(0, 0, 0), font=lato_font_bold, anchor="ms")
+        draw.text(((index + 0.5) * 61.5, 475), str(round(entry["feelsLikeTemperature"], 1)), fill=(100, 100, 100), font=lato_font_regular, anchor="ms")
 
         # Increasing index
         index += 1
@@ -196,12 +200,12 @@ draw.line((30, 300, 770, 300), fill=(0, 0, 0), width=2)
 # Looping through the temp data points and drawing a graph
 for i in range(len(actualTempPoints) - 1):
     # Calculating the line coords for the actual temperature
-    actualTempLineStart = (i * 29.6 + 30.75, (actualTempPoints[i] - minGraphTemp) / tempGraphHeight * -50 + 355)
-    actualTempLineEnd = ((i + 1) * 29.6 + 30.75, (actualTempPoints[i + 1] - minGraphTemp) / tempGraphHeight * -50 + 355)
+    actualTempLineStart = (i * 30.833 + 30.75, (actualTempPoints[i] - minGraphTemp) / tempGraphHeight * -50 + 355)
+    actualTempLineEnd = ((i + 1) * 30.833 + 30.75, (actualTempPoints[i + 1] - minGraphTemp) / tempGraphHeight * -50 + 355)
 
     # Calculating the line coords for the feels like temperature
-    feelsLikeTempLineStart = (i * 29.6 + 30.75, (feelsLikeTempPoints[i] - minGraphTemp) / tempGraphHeight * -50 + 355)
-    feelsLikeTempLineEnd = ((i + 1) * 29.6 + 30.75, (feelsLikeTempPoints[i + 1] - minGraphTemp) / tempGraphHeight * -50 + 355)
+    feelsLikeTempLineStart = (i * 30.833 + 30.75, (feelsLikeTempPoints[i] - minGraphTemp) / tempGraphHeight * -50 + 355)
+    feelsLikeTempLineEnd = ((i + 1) * 30.833 + 30.75, (feelsLikeTempPoints[i + 1] - minGraphTemp) / tempGraphHeight * -50 + 355)
 
     # Drawing a line from point i to i + 1
     draw.line((feelsLikeTempLineStart, feelsLikeTempLineEnd), fill=(100, 100, 100), width=3)
