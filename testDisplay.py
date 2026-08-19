@@ -1,8 +1,17 @@
 ﻿from PIL import Image, ImageDraw, ImageFont
 from datetime import datetime
+from zoneinfo import ZoneInfo
 import requests
 import sys
 
+# Trying to import inky stuff
+try:
+    from inky.auto import auto
+    print("Inky succesfully loaded")
+except:
+    print("Failed to load Inky library")
+
+# Defining information for requesting data
 BASE_URL = "https://data.hub.api.metoffice.gov.uk/sitespecific/v0/point/hourly"
 HEADERS = {
     "apikey" : open('api_key', 'r').read(),
@@ -83,14 +92,8 @@ WEATHER_CODE_SYMBOLS = {
     30 : ""   # Thunder
 }
 
+# Defining the time series array that will contain the info for the display
 timeSeriesList = [];
-
-# def kelvin_to_celsius(kelvin) :
-#     return (kelvin - 273.15)
-
-# def kelvin_to_farenheit(kelvin) :
-#     return (kelvin - 273.15) * (9/5) + 32
-
 
 # Getting the info from the API
 try:
@@ -122,9 +125,9 @@ draw = ImageDraw.Draw(image)
 
 # Loading font
 try:
-    lato_font_bold = ImageFont.truetype("Lato/Lato-Bold.ttf", size=20)
-    lato_font_regular = ImageFont.truetype("Lato/Lato-Regular.ttf", size=20)
-    symbol_font = ImageFont.truetype("easy_weather_icons_font/easy_weather_icons_font.ttf", size=40)
+    lato_font_bold = ImageFont.truetype("Lato/Lato-Bold.ttf", size=15)
+    lato_font_regular = ImageFont.truetype("Lato/Lato-Regular.ttf", size=15)
+    symbol_font = ImageFont.truetype("easy_weather_icons_font/easy_weather_icons_font.ttf", size=32)
 except IOError:
     lato_font_large = ImageFont.load_default()
     lato_font_small = ImageFont.load_default()
@@ -137,13 +140,84 @@ except IOError:
 # draw.text((0, 0), "Today in music history:", fill=(0, 0, 0), font=lato_font)
 # draw.text((0, 40), "", fill=(0, 0, 0), font=symbol_font)
 
-for index, entry in enumerate(timeSeriesList):
+# Getting the current date
+dundeeTime = datetime.now(ZoneInfo("Europe/London"))
+
+# Defining members for keeping track of temp data for the graph
+maxGraphTemp = max(timeSeriesList[0]["screenTemperature"], timeSeriesList[0]["feelsLikeTemperature"])
+minGraphTemp = min(timeSeriesList[0]["screenTemperature"], timeSeriesList[0]["feelsLikeTemperature"])
+maxTemp = timeSeriesList[0]["screenTemperature"]
+minTemp = timeSeriesList[0]["screenTemperature"]
+actualTempPoints = []
+feelsLikeTempPoints = []
+
+# Looping through each time series data point
+index = 0;
+for entry in timeSeriesList:
+    # Getting time data
     dateTimeObject = datetime.strptime(entry["time"], "%Y-%m-%dT%H:%S%z")
-    timeString = dateTimeObject.strftime("%I:%M %p")
-    draw.text((index * 50, 200), WEATHER_CODE_SYMBOLS[entry["significantWeatherCode"]], fill=(0, 0, 0), font=symbol_font)
-    draw.text((index * 50, 240), str(round(entry["screenTemperature"], 1)), fill=(0, 0, 0), font=lato_font_bold)
-    draw.text((index * 50, 265), str(round(entry["feelsLikeTemperature"], 1)), fill=(100, 100, 100), font=lato_font_regular, )
+
+    # If the date doesn't equal the current date, skip
+    if (dateTimeObject.date() != dundeeTime.date()):
+        continue
+
+    # Calculating time
+    timeString = dateTimeObject.strftime("%#H").lower()
+
+    # Drawing time
+    draw.text(((index + 0.5) * 33, 400), timeString, fill=(0, 0, 0), font=lato_font_bold, anchor="mb")
+
+    # Drawing weather condition symbol
+    draw.text(((index + 0.5) * 33, 435), WEATHER_CODE_SYMBOLS[entry["significantWeatherCode"]], fill=(0, 0, 0), font=symbol_font, anchor="mb")
+
+    # Drawing temps
+    draw.text(((index + 0.5) * 33, 455), str(round(entry["screenTemperature"], 1)), fill=(0, 0, 0), font=lato_font_bold, anchor="mb")
+    draw.text(((index + 0.5) * 33, 475), str(round(entry["feelsLikeTemperature"], 1)), fill=(100, 100, 100), font=lato_font_regular, anchor="mb")
+
+    # Adding the temperature data points
+    actualTempPoints.append(entry["screenTemperature"])
+    feelsLikeTempPoints.append(entry["feelsLikeTemperature"])
+
+    # Updating max/min temps
+    maxGraphTemp = max(maxTemp, max(entry["screenTemperature"], entry["feelsLikeTemperature"]))
+    minGraphTemp = min(minTemp, min(entry["screenTemperature"], entry["feelsLikeTemperature"]))
+    maxTemp = max(maxTemp, entry["screenTemperature"])
+    minTemp = min(minTemp, entry["screenTemperature"])
+
+    # Increasing index
+    index += 1
+
+# Drawing a box for the temp graph
+tempGraphHeight = maxGraphTemp - minGraphTemp
+draw.rectangle(
+    (10, 320, 790, 380),
+    fill=None,
+    outline=(0, 0, 0),
+    width=2
+)
+
+# Looping through the temp data points and drawing a graph
+for i in range(index - 1):
+    # Calculating the line coords for the actual temperature
+    actualTempLineStart = ((i + 0.5) * 33, (actualTempPoints[i] - minGraphTemp) / tempGraphHeight * -50 + 375)
+    actualTempLineEnd = ((i + 1.5) * 33, (actualTempPoints[i + 1] - minGraphTemp) / tempGraphHeight * -50 + 375)
+
+    # Calculating the line coords for the feels like temperature
+    feelsLikeTempLineStart = ((i + 0.5) * 33, (feelsLikeTempPoints[i] - minGraphTemp) / tempGraphHeight * -50 + 375)
+    feelsLikeTempLineEnd = ((i + 1.5) * 33, (feelsLikeTempPoints[i + 1] - minGraphTemp) / tempGraphHeight * -50 + 375)
+
+    # Drawing a line from point i to i + 1
+    draw.line((feelsLikeTempLineStart, feelsLikeTempLineEnd), fill=(100, 100, 100), width=3)
+    draw.line((actualTempLineStart, actualTempLineEnd), fill=(0, 0, 0), width=3)
+
+
+# Saving the image
+image.save("testImage.png")
 
 # Saving & showing the image
-image.save("testImage.png")
-image.show()
+try:
+    inky_display = auto(ask_user=True, verbose=True)
+    inky_display.set_image(image)
+    inky_display.show()
+except:
+    print("Failed to run inky functions")
