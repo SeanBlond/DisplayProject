@@ -125,22 +125,15 @@ draw = ImageDraw.Draw(image)
 
 # Loading font
 try:
-    lato_font_bold = ImageFont.truetype("Lato/Lato-Bold.ttf", size=15)
-    lato_font_regular = ImageFont.truetype("Lato/Lato-Regular.ttf", size=15)
-    symbol_font = ImageFont.truetype("easy_weather_icons_font/easy_weather_icons_font.ttf", size=32)
+    lato_font_bold = ImageFont.truetype("Lato/Lato-Bold.ttf", size=20)
+    lato_font_regular = ImageFont.truetype("Lato/Lato-Regular.ttf", size=20)
+    symbol_font = ImageFont.truetype("easy_weather_icons_font/easy_weather_icons_font.ttf", size=40)
 except IOError:
     lato_font_large = ImageFont.load_default()
     lato_font_small = ImageFont.load_default()
     symbol_font = ImageFont.load_default()
 
-# Drawing stuff to the image
-# draw.rectangle((50, 50, 200, 200), fill=(255, 255, 0))  # Rectangle
-# draw.ellipse((150, 150, 300, 300), fill=(255, 0, 0))  # Circle (ellipse)
-# draw.line((0, 0, 400, 400), fill=(0, 0, 255), width=10)  # Diagonal line
-# draw.text((0, 0), "Today in music history:", fill=(0, 0, 0), font=lato_font)
-# draw.text((0, 40), "", fill=(0, 0, 0), font=symbol_font)
-
-# Getting the current date
+# Getting the current date and allowed tomorrow date
 dundeeTime = datetime.now(ZoneInfo("Europe/London"))
 
 # Defining members for keeping track of temp data for the graph
@@ -164,15 +157,20 @@ for entry in timeSeriesList:
     # Calculating time
     timeString = dateTimeObject.strftime("%#H").lower()
 
-    # Drawing time
-    draw.text(((index + 0.5) * 33, 400), timeString, fill=(0, 0, 0), font=lato_font_bold, anchor="mb")
+    # Only draw the data if the hour is even
+    if (dateTimeObject.hour % 2 == 0):
+        # Drawing time
+        draw.text(((index + 0.5) * 61.5, 395), timeString, fill=(0, 0, 0), font=lato_font_bold, anchor="mb")
 
-    # Drawing weather condition symbol
-    draw.text(((index + 0.5) * 33, 435), WEATHER_CODE_SYMBOLS[entry["significantWeatherCode"]], fill=(0, 0, 0), font=symbol_font, anchor="mb")
+        # Drawing weather condition symbol
+        draw.text(((index + 0.5) * 61.5, 430), WEATHER_CODE_SYMBOLS[entry["significantWeatherCode"]], fill=(0, 0, 0), font=symbol_font, anchor="mb")
 
-    # Drawing temps
-    draw.text(((index + 0.5) * 33, 455), str(round(entry["screenTemperature"], 1)), fill=(0, 0, 0), font=lato_font_bold, anchor="mb")
-    draw.text(((index + 0.5) * 33, 475), str(round(entry["feelsLikeTemperature"], 1)), fill=(100, 100, 100), font=lato_font_regular, anchor="mb")
+        # Drawing temps
+        draw.text(((index + 0.5) * 61.5, 450), str(round(entry["screenTemperature"], 1)), fill=(0, 0, 0), font=lato_font_bold, anchor="mb")
+        draw.text(((index + 0.5) * 61.5, 475), str(round(entry["feelsLikeTemperature"], 1)), fill=(100, 100, 100), font=lato_font_regular, anchor="mb")
+
+        # Increasing index
+        index += 1
 
     # Adding the temperature data points
     actualTempPoints.append(entry["screenTemperature"])
@@ -184,27 +182,26 @@ for entry in timeSeriesList:
     maxTemp = max(maxTemp, entry["screenTemperature"])
     minTemp = min(minTemp, entry["screenTemperature"])
 
-    # Increasing index
-    index += 1
-
 # Drawing a box for the temp graph
-tempGraphHeight = maxGraphTemp - minGraphTemp
+tempGraphHeight = max(maxGraphTemp - minGraphTemp, 5)
 draw.rectangle(
-    (10, 320, 790, 380),
-    fill=None,
-    outline=(0, 0, 0),
-    width=2
+    (30, 300, 770, 360),
+    fill=(200, 200, 200)
 )
+draw.text((25, 360), str(round(minGraphTemp)), fill=(0, 0, 0), font=lato_font_regular, anchor="rb")
+draw.text((25, 300), str(round(maxGraphTemp)), fill=(0, 0, 0), font=lato_font_regular, anchor="rt")
+draw.line((30, 360, 770, 360), fill=(0, 0, 0), width=2)
+draw.line((30, 300, 770, 300), fill=(0, 0, 0), width=2)
 
 # Looping through the temp data points and drawing a graph
-for i in range(index - 1):
+for i in range(len(actualTempPoints) - 1):
     # Calculating the line coords for the actual temperature
-    actualTempLineStart = ((i + 0.5) * 33, (actualTempPoints[i] - minGraphTemp) / tempGraphHeight * -50 + 375)
-    actualTempLineEnd = ((i + 1.5) * 33, (actualTempPoints[i + 1] - minGraphTemp) / tempGraphHeight * -50 + 375)
+    actualTempLineStart = (i * 29.6 + 30.75, (actualTempPoints[i] - minGraphTemp) / tempGraphHeight * -50 + 355)
+    actualTempLineEnd = ((i + 1) * 29.6 + 30.75, (actualTempPoints[i + 1] - minGraphTemp) / tempGraphHeight * -50 + 355)
 
     # Calculating the line coords for the feels like temperature
-    feelsLikeTempLineStart = ((i + 0.5) * 33, (feelsLikeTempPoints[i] - minGraphTemp) / tempGraphHeight * -50 + 375)
-    feelsLikeTempLineEnd = ((i + 1.5) * 33, (feelsLikeTempPoints[i + 1] - minGraphTemp) / tempGraphHeight * -50 + 375)
+    feelsLikeTempLineStart = (i * 29.6 + 30.75, (feelsLikeTempPoints[i] - minGraphTemp) / tempGraphHeight * -50 + 355)
+    feelsLikeTempLineEnd = ((i + 1) * 29.6 + 30.75, (feelsLikeTempPoints[i + 1] - minGraphTemp) / tempGraphHeight * -50 + 355)
 
     # Drawing a line from point i to i + 1
     draw.line((feelsLikeTempLineStart, feelsLikeTempLineEnd), fill=(100, 100, 100), width=3)
