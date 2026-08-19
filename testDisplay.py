@@ -135,8 +135,7 @@ except IOError:
 
 # Getting the current date and allowed tomorrow date
 dundeeTime = datetime.now(ZoneInfo("Europe/London")) + timedelta(days=1)
-allowedFutureDate = dundeeTime + timedelta(days=1)
-allowedFutureDate = allowedFutureDate.replace(hour=0)
+allowedFutureDate = (dundeeTime + timedelta(days=1)).replace(hour=0)
 
 # Defining members for keeping track of temp data for the graph
 maxGraphTemp = max(timeSeriesList[0]["screenTemperature"], timeSeriesList[0]["feelsLikeTemperature"])
@@ -163,15 +162,11 @@ for entry in timeSeriesList:
 
     # Only draw the data if the hour is even
     if (dateTimeObject.hour % 2 == 0):
-        # Drawing time
-        draw.text(((index + 0.5) * 61.5, 390), timeString, fill=(0, 0, 0), font=lato_font_bold, anchor="ms")
-
         # Drawing weather condition symbol
-        draw.text(((index + 0.5) * 61.5, 430), WEATHER_CODE_SYMBOLS[entry["significantWeatherCode"]], fill=(0, 0, 0), font=symbol_font, anchor="ms")
+        draw.text(((index + 0.5) * 61.5, 450), WEATHER_CODE_SYMBOLS[entry["significantWeatherCode"]], fill=(0, 0, 0), font=symbol_font, anchor="ms")
 
-        # Drawing temps
-        draw.text(((index + 0.5) * 61.5, 450), str(round(entry["screenTemperature"], 1)), fill=(0, 0, 0), font=lato_font_bold, anchor="ms")
-        draw.text(((index + 0.5) * 61.5, 475), str(round(entry["feelsLikeTemperature"], 1)), fill=(100, 100, 100), font=lato_font_regular, anchor="ms")
+        # Drawing time
+        draw.text(((index + 0.5) * 61.5, 470), timeString, fill=(0, 0, 0), font=lato_font_bold, anchor="ms")
 
         # Increasing index
         index += 1
@@ -189,28 +184,34 @@ for entry in timeSeriesList:
 # Drawing a box for the temp graph
 tempGraphHeight = max(maxGraphTemp - minGraphTemp, 5)
 draw.rectangle(
-    (30, 300, 770, 360),
+    (30, 320, 770, 410),
     fill=(200, 200, 200)
 )
-draw.text((25, 360), str(round(minGraphTemp)), fill=(0, 0, 0), font=lato_font_regular, anchor="rb")
-draw.text((25, 300), str(round(maxGraphTemp)), fill=(0, 0, 0), font=lato_font_regular, anchor="rt")
-draw.line((30, 360, 770, 360), fill=(0, 0, 0), width=2)
-draw.line((30, 300, 770, 300), fill=(0, 0, 0), width=2)
+draw.text((25, 410), str(round(minGraphTemp)), fill=(0, 0, 0), font=lato_font_regular, anchor="rb")
+draw.text((25, 320), str(round(maxGraphTemp)), fill=(0, 0, 0), font=lato_font_regular, anchor="rt")
+draw.line((30, 410, 770, 410), fill=(0, 0, 0), width=2)
+draw.line((30, 320, 770, 320), fill=(0, 0, 0), width=2)
 
 # Looping through the temp data points and drawing a graph
 for i in range(len(actualTempPoints) - 1):
     # Calculating the line coords for the actual temperature
-    actualTempLineStart = (i * 30.833 + 30.75, (actualTempPoints[i] - minGraphTemp) / tempGraphHeight * -50 + 355)
-    actualTempLineEnd = ((i + 1) * 30.833 + 30.75, (actualTempPoints[i + 1] - minGraphTemp) / tempGraphHeight * -50 + 355)
+    actualTempLineStart = (i * 30.833 + 30.75, (actualTempPoints[i] - minGraphTemp) / tempGraphHeight * -80 + 405)
+    actualTempLineEnd = ((i + 1) * 30.833 + 30.75, (actualTempPoints[i + 1] - minGraphTemp) / tempGraphHeight * -80 + 405)
 
     # Calculating the line coords for the feels like temperature
-    feelsLikeTempLineStart = (i * 30.833 + 30.75, (feelsLikeTempPoints[i] - minGraphTemp) / tempGraphHeight * -50 + 355)
-    feelsLikeTempLineEnd = ((i + 1) * 30.833 + 30.75, (feelsLikeTempPoints[i + 1] - minGraphTemp) / tempGraphHeight * -50 + 355)
+    feelsLikeTempLineStart = (i * 30.833 + 30.75, (feelsLikeTempPoints[i] - minGraphTemp) / tempGraphHeight * -80 + 405)
+    feelsLikeTempLineEnd = ((i + 1) * 30.833 + 30.75, (feelsLikeTempPoints[i + 1] - minGraphTemp) / tempGraphHeight * -80 + 405)
 
     # Drawing a line from point i to i + 1
     draw.line((feelsLikeTempLineStart, feelsLikeTempLineEnd), fill=(100, 100, 100), width=3)
     draw.line((actualTempLineStart, actualTempLineEnd), fill=(0, 0, 0), width=3)
 
+# Drawing incremental lines for each integer degree value
+degrees = int(round(maxGraphTemp) - round(minGraphTemp))
+degreeOffset = 90 / float(degrees)
+for i in range(degrees):
+    lineYPos = 410 - (i * degreeOffset)
+    draw.line((30, lineYPos, 770, lineYPos), fill=(85, 85, 85), width=1)
 
 # Saving the image
 image.save("testImage.png")
