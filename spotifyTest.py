@@ -65,31 +65,91 @@ def searchForArtist(token, artistName):
     return jsonResult[0]
 
 def getAlbumsByArtist(token, artistID):
-    # Defining info used to request API data
-    url = f"https://api.spotify.com/v1/artists/{artistID}/albums"
-    headers = getAuthHeader(token)
-    params = { 
-        "limit": 10,
-        "include_groups": "album"
-    }
+    albumList = []
+    loopActive = True
+    index = 0
 
+    while loopActive:
+        # Defining info used to request API data
+        url = f"https://api.spotify.com/v1/artists/{artistID}/albums"
+        headers = getAuthHeader(token)
+        params = { 
+            "limit": 10,
+            "offset": index
+            #"include_groups": "album"
+        }
 
-    # Requesting the data
-    response = requests.get(url, headers=headers, params=params)
-    jsonResult = json.loads(response.content)["items"]
+        # Requesting the data
+        response = requests.get(url, headers=headers, params=params)
 
-    # Returning None if there are no artists
-    if (len(jsonResult) == 0):
-        print(f"No Albums found by artist: {artistID}")
-        return None
+        if response.status_code == 429:
+            # Get the header (default to 5 seconds if not found)
+            retry_after = int(response.headers.get("Retry-After", 5))
+            print(f"Rate limited! Waiting for {retry_after} seconds.")
+
+        jsonResult = json.loads(response.content)
+        print(jsonResult)
+        albumsInJson = json.loads(response.content)["items"]
+
+        # loading in each album
+        for album in albumsInJson:
+            albumObject = {"id": album["id"], "release_date": album["release_date"]}
+            albumList.append(albumObject)
+
+        # Increasing index
+        index += 10
+
+        # Checking if the loop can be closed
+        if (index > jsonResult["total"] or index >= 50):
+            loopActive = False
 
     # Returning the albums
-    return jsonResult
+    return albumList
 
 # Running above function to get the token
 token = getToken()
 
-artistID = "0epOFNiUfyON9EYx7Tpr6V"
-albums = getAlbumsByArtist(token, artistID)
-for album in albums:
-    print(f"{album["name"]}: {album["release_date"]}")
+artists = [
+    "6FlOCziOXI157pvUREAh3E",
+    "60YWN7EYUFUjIRTx0bX5Lj",
+    "0vFpdm2mk6RPUlJrU5hDLY",
+    "6p2HnfM955TI1bX34dkLnI",
+    "4dAQ5VFw5nhwA6rTf3ENQ2",
+    "6bVGMtAf6mPtO1LWxUg1y5",
+    "0qmHQLCyJrgGFtqLDSRHJ4",
+    "4JfHqFjyolUL4WIReuucSs",
+    "5ictveRyhWRs8Gt8Dvt1hS",
+    "38SKxCyfrmNWqWunb9wGHP",
+    "6vCs4rj3rvYAX3l7dEiPq9",
+    "5e4mQ2QunM3CN88XI65i7V",
+    "1HxXNvsraqrsgfmju1yKk8",
+    "5vh3TBzvI4nASt2A1KfgcR",
+    "6RU2UUN1UIOWpP3aO6M70K",
+    "5N5jf98OOEf3uAIJpi1deD",
+    "69Kp4bE7aUWEPrmTwmhVZR",
+    "3lWVgSwutPsiJ8Awm7OTKU",
+    "0epOFNiUfyON9EYx7Tpr6V",
+    "0NIPkIjTV8mB795yEIiPYL",
+    "4aKWmkWAKviFlyvHYPTNQY",
+    "7m5HFZUYErjDv6fblK43w3",
+    "5h6KJPKB8cSVJTWZhKAZoT",
+    "5Vd6nIpBPLzJDQDcvILQu4",
+    "73rPcaYEhBd0UuVZBqqyQJ",
+    "0lawSNBxNgJFQYJnQzLH8c",
+    "7gW0r5CkdEUMm42w9XpyZO",
+    "74KM79TiuVKeVCqs8QtB0B",
+    "3uwUtL5kPSO2mpOhU4SiWz",
+    "4DiZJ3Gg7B1EWeKoQO36Ae",
+    "07VKGw5BhunkwMnvz71Z1h",
+    "5YA1c6yVkPnflTLMfOgjzc"
+]
+
+exportJson = {}
+for artist in artists:
+    albums = getAlbumsByArtist(token, artist)
+    print(f"Loaded artist {artist} with {len(albums)} albums")
+    exportJson[artist] = albums
+
+# Dumping the json
+with open('output.json', 'w', encoding='utf-8') as file:
+    json.dump(exportJson, file, indent=4)

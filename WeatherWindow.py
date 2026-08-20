@@ -1,40 +1,28 @@
 ﻿from PIL import Image, ImageDraw, ImageFont
 from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
-from dotenv import load_dotenv
 import requests
 import sys
-import os
 
-# Trying to import inky stuff
-try:
-    from inky.auto import auto
-    print("Inky succesfully loaded")
-except:
-    print("Failed to load Inky library")
-
-# Creating image and drawing device
-image = Image.new("P", (480, 800), "white")
-draw = ImageDraw.Draw(image)
-
-# Loading fonts
-try:
-    small_lato_font_regular = ImageFont.truetype("Lato/Lato-Regular.ttf", size=15)
-    symbol_font = ImageFont.truetype("easy_weather_icons_font/easy_weather_icons_font.ttf", size=35)
-except IOError:
-    small_lato_font_regular = ImageFont.load_default()
-    symbol_font = ImageFont.load_default()
-
-# Getting weather api ket
-load_dotenv()
-WEATHER_API_KEY = os.getenv("MET_WEATHER_KEY")
-
-def DrawWeatherGraph(startingYPos):
+def DrawWeatherGraph(draw, API_KEY, startingYPos):
+    # Loading fonts
+    try:
+        small_lato_font_regular = ImageFont.truetype("Lato/Lato-Regular.ttf", size=15)
+        medium_lato_font_regular = ImageFont.truetype("Lato/Lato-Regular.ttf", size=28)
+        large_lato_font_regular = ImageFont.truetype("Lato/Lato-Regular.ttf", size=36)
+        symbol_font = ImageFont.truetype("easy_weather_icons_font/easy_weather_icons_font.ttf", size=35)
+        large_symbol_font = ImageFont.truetype("easy_weather_icons_font/easy_weather_icons_font.ttf", size=48)
+    except IOError:
+        small_lato_font_regular = ImageFont.load_default()
+        medium_lato_font_regular = ImageFont.load_default()
+        large_lato_font_regular = ImageFont.load_default()
+        large_symbol_font = ImageFont.load_default()
+        symbol_font = ImageFont.load_default()
 
     # Defining information for requesting data
     BASE_URL = "https://data.hub.api.metoffice.gov.uk/sitespecific/v0/point/hourly"
     HEADERS = {
-        "apikey" : WEATHER_API_KEY,
+        "apikey" : API_KEY,
         "accept" : "applications"
     }
     PARAMS = {
@@ -124,7 +112,6 @@ def DrawWeatherGraph(startingYPos):
 
         # Parsing the data
         weather_data = response.json()
-        print("Succesfully read API data located at", weather_data["features"][0]["properties"]["location"]["name"])
         timeSeriesList = weather_data["features"][0]["properties"]["timeSeries"];
 
     except requests.exceptions.requests.HTTPError as http_err:
@@ -133,14 +120,13 @@ def DrawWeatherGraph(startingYPos):
     except Exception as err:
         print(f"Error occurred: {err}")
 
-
     # Looping through each time if applicable
     if (len(timeSeriesList) == 0):
         return
 
     # Drawing the background
     draw.rectangle(
-        (0, startingYPos - 200, 480, startingYPos),
+        (0, startingYPos - 300, 480, startingYPos),
         fill=(99, 151, 235))
 
     # Getting the current date and allowed tomorrow date
@@ -194,54 +180,98 @@ def DrawWeatherGraph(startingYPos):
     # Drawing a box for the temp graph
     tempGraphHeight = max(maxGraphTemp - minGraphTemp, 5)
     draw.rectangle(
-        (20, startingYPos - 190, 460, startingYPos - 60),
+        (20, startingYPos - 160, 460, startingYPos - 60),
         fill=(80, 118, 212)
     )
 
     # Drawing incremental lines for each integer degree value
     degrees = int(round(maxGraphTemp) - round(minGraphTemp))
-    degreeOffset = 130 / float(degrees)
+    degreeOffset = 100 / float(degrees)
     for i in range(degrees):
         lineYPos = startingYPos - 60 - (i * degreeOffset)
         draw.line((20, lineYPos, 460, lineYPos), fill=(37, 73, 161), width=1)
 
     # Drawing lines and labels for the top and bottom lines
     draw.text((18, startingYPos - 60), str(round(minGraphTemp)), fill=(255, 255, 255), font=small_lato_font_regular, anchor="rb")
-    draw.text((18, startingYPos - 190), str(round(maxGraphTemp)), fill=(255, 255, 255), font=small_lato_font_regular, anchor="rt")
+    draw.text((18, startingYPos - 160), str(round(maxGraphTemp)), fill=(255, 255, 255), font=small_lato_font_regular, anchor="rt")
     draw.line((20, startingYPos - 60, 460, startingYPos - 60), fill=(255, 255, 255), width=2)
-    draw.line((20, startingYPos - 190, 460, startingYPos - 190), fill=(255, 255, 255), width=2)
+    draw.line((20, startingYPos - 160, 460, startingYPos - 160), fill=(255, 255, 255), width=2)
 
     # Looping through the temp data points and drawing a graph
     for i in range(len(actualTempPoints) - 1):
         # Calculating the line coords for the actual temperature
-        actualTempLineStart = (i * 18.333 + 20, (actualTempPoints[i] - minGraphTemp) / tempGraphHeight * -120 + startingYPos - 65)
-        actualTempLineEnd = ((i + 1) * 18.333 + 20, (actualTempPoints[i + 1] - minGraphTemp) / tempGraphHeight * -120 + startingYPos - 65)
+        actualTempLineStart = (i * 18.333 + 20, (actualTempPoints[i] - minGraphTemp) / tempGraphHeight * -90 + startingYPos - 65)
+        actualTempLineEnd = ((i + 1) * 18.333 + 20, (actualTempPoints[i + 1] - minGraphTemp) / tempGraphHeight * -90 + startingYPos - 65)
 
         # Calculating the line coords for the feels like temperature
-        feelsLikeTempLineStart = (i * 18.333 + 20, (feelsLikeTempPoints[i] - minGraphTemp) / tempGraphHeight * -120 + startingYPos - 65)
-        feelsLikeTempLineEnd = ((i + 1) * 18.333 + 20, (feelsLikeTempPoints[i + 1] - minGraphTemp) / tempGraphHeight * -120 + startingYPos - 65)
+        feelsLikeTempLineStart = (i * 18.333 + 20, (feelsLikeTempPoints[i] - minGraphTemp) / tempGraphHeight * -90 + startingYPos - 65)
+        feelsLikeTempLineEnd = ((i + 1) * 18.333 + 20, (feelsLikeTempPoints[i + 1] - minGraphTemp) / tempGraphHeight * -90 + startingYPos - 65)
 
         # Drawing a line from point i to i + 1
         draw.line((feelsLikeTempLineStart, feelsLikeTempLineEnd), fill=(200, 200, 200), width=3)
         draw.line((actualTempLineStart, actualTempLineEnd), fill=(255, 255, 255), width=3)
 
-# Drawing the weather graph
-DrawWeatherGraph(800)
+    # Getting daily weather info
+    BASE_URL = "https://data.hub.api.metoffice.gov.uk/sitespecific/v0/point/daily"
+    HEADERS = {
+        "apikey" : API_KEY,
+        "accept" : "applications"
+    }
+    PARAMS = {
+        "latitude": "56.462002",
+        "longitude": "-2.970700",
+        "excludeParameterMetadata": "true",
+        "includeLocationName": "true"
+    }
 
-# Saving the image
-image.save("testImage.png")
+    # Getting the info from the API
+    try:
+        response = requests.get(BASE_URL, headers=HEADERS, params=PARAMS, timeout=10)
 
-#Inky stuff
-try:
-    #Creating the inky display object
-    inky_display = auto(ask_user=True, verbose=True)
+        # Chefcking if the request was succesful
+        response.raise_for_status()
 
-    #Rotating the image to fit the display
-    inkyImage = Image.new("P", (inky_display.width, inky_display.height), inky_display.WHITE)
-    rotImage = image.rotate(90, expand=True)
+        # Parsing the data
+        weather_data = response.json()
+        print("Succesfully read API data located at", weather_data["features"][0]["properties"]["location"]["name"])
 
-    # Sending the rotated image to the inky display
-    inky_display.set_image(rotImage)
-    inky_display.show()
-except:
-    print("Failed to run inky functions")
+        # Looping through each day to check which one is the correct day
+        weatherToday = {}
+        for day in weather_data["features"][0]["properties"]["timeSeries"]:
+            date = datetime.strptime(day["time"], "%Y-%m-%dT%H:%S%z")
+            if (date.date() == dundeeTime.date()):
+                weatherToday = day
+                break
+
+        # Drawing temp ranges
+        tempRange = f"{round(weatherToday["dayUpperBoundMaxTemp"])}°C / {round(weatherToday["nightLowerBoundMinTemp"])}°C" 
+        feelsLikeTempRange = f"{round(weatherToday["dayUpperBoundMaxFeelsLikeTemp"])}°C / {round(weatherToday["nightLowerBoundMinFeelsLikeTemp"])}°C" 
+        draw.text((240, startingYPos - (200 + 5)), tempRange, fill=(255, 255, 255), font=large_lato_font_regular, anchor="mb")
+        draw.text((240, startingYPos - (200 - 3)), feelsLikeTempRange, fill=(200, 200, 200), font=medium_lato_font_regular, anchor="mt")
+
+        # Drawing chance of rain
+        rainIcons = [
+            "", # Nothing
+            "", # Showers
+            "", # Rain
+            "", # Heavy Showers
+        ]
+        rainChance = f"{weatherToday["dayProbabilityOfPrecipitation"]}%"
+        rainIconIndex = round((weatherToday["dayProbabilityOfPrecipitation"] / 25))
+        draw.text((80, startingYPos - (200 + 3)), rainIcons[rainIconIndex], fill=(255, 255, 255), font=large_symbol_font, anchor="mb")
+        draw.text((80, startingYPos - (200 - 3)), rainChance, fill=(200, 200, 200), font=medium_lato_font_regular, anchor="mt")
+
+        # Drawing wind speeds
+        windSpeeds = f"{weatherToday["midday10MWindSpeed"]}"
+        draw.text((400, startingYPos - (200 - 3)), "", fill=(255, 255, 255), font=large_symbol_font, anchor="mb")
+        draw.text((400, startingYPos - (200 - 3)), windSpeeds, fill=(200, 200, 200), font=medium_lato_font_regular, anchor="mt")
+
+        # Drawing day at the top
+        dateText = dundeeTime.strftime("%A, %B %#d, %Y")
+        draw.text((240, startingYPos - 282), dateText, fill=(255, 255, 255), font=medium_lato_font_regular, anchor="mt")
+        
+    except requests.exceptions.requests.HTTPError as http_err:
+        print(f"HTTP error occurred: {http_err}")
+
+    except Exception as err:
+        print(f"Error occurred: {err}")
