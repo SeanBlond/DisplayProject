@@ -1,5 +1,5 @@
 {
-    "arist_releases": [
+    "artists": [
         {
             "name": "Los Campesinos!",
             "weight": 10,
@@ -96,10 +96,6 @@
                 {
                     "id": "3IptnNlcq41lycuW3Zwhsj",
                     "release_date": "2010-08-24"
-                },
-                {
-                    "id": "5Rr8AOVFBDVT6iIzbhriAI",
-                    "release_date": "2010"
                 },
                 {
                     "id": "7iZfoW1tyrSd9InpQwPiqE",
