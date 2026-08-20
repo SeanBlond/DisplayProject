@@ -1,5 +1,6 @@
 from PIL import Image, ImageDraw, ImageFont
-import WeatherWindow
+#import WeatherWindow
+import ArtWindow
 from dotenv import load_dotenv
 import os
 
@@ -20,7 +21,8 @@ load_dotenv()
 WEATHER_API_KEY = os.getenv("MET_WEATHER_KEY")
 
 # Calling the different window functions
-WeatherWindow.DrawWeatherGraph(draw, WEATHER_API_KEY, 300)
+#WeatherWindow.DrawWeatherGraph(draw, WEATHER_API_KEY, 300)
+ArtWindow.DrawArtWindow(draw, 550)
 
 # Saving the image
 image.save("displayImage.png")

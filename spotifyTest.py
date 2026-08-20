@@ -69,6 +69,7 @@ def getAlbumsByArtist(token, artistID):
     loopActive = True
     index = 0
 
+    print(f"Albums from artist {artistID}")
     while loopActive:
         # Defining info used to request API data
         url = f"https://api.spotify.com/v1/artists/{artistID}/albums"
@@ -88,12 +89,12 @@ def getAlbumsByArtist(token, artistID):
             print(f"Rate limited! Waiting for {retry_after} seconds.")
 
         jsonResult = json.loads(response.content)
-        print(jsonResult)
         albumsInJson = json.loads(response.content)["items"]
 
         # loading in each album
         for album in albumsInJson:
             albumObject = {"id": album["id"], "release_date": album["release_date"]}
+            print (albumObject)
             albumList.append(albumObject)
 
         # Increasing index

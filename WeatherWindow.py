@@ -6,7 +6,7 @@ import sys
 
 def DrawWeatherGraph(draw, API_KEY, startingYPos):
     # Loading fonts
-    try:
+    try:-pytho
         small_lato_font_regular = ImageFont.truetype("Lato/Lato-Regular.ttf", size=15)
         medium_lato_font_regular = ImageFont.truetype("Lato/Lato-Regular.ttf", size=28)
         large_lato_font_regular = ImageFont.truetype("Lato/Lato-Regular.ttf", size=36)
