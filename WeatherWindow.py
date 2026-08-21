@@ -4,7 +4,7 @@ from zoneinfo import ZoneInfo
 import requests
 import sys
 
-def DrawWindow(draw, API_KEY, startingYPos):
+def DrawWindow(draw, COLOR_PALETTE, API_KEY, startingYPos):
     # Loading fonts
     try:
         small_lato_font_regular = ImageFont.truetype("Lato/Lato-Regular.ttf", size=15)
@@ -127,7 +127,7 @@ def DrawWindow(draw, API_KEY, startingYPos):
     # Drawing the background
     draw.rectangle(
         (0, startingYPos - 300, 480, startingYPos),
-        fill=(99, 151, 235))
+        fill=COLOR_PALETTE["BLUE"])
 
     # Getting the current date and allowed tomorrow date
     dundeeTime = datetime.now(ZoneInfo("Europe/London")) + timedelta(days=1)
@@ -159,10 +159,10 @@ def DrawWindow(draw, API_KEY, startingYPos):
         # Only draw the data if the hour is even
         if (dateTimeObject.hour % 2 == 0):
             # Drawing weather condition symbol
-            draw.text(((index + 0.5) * 37, startingYPos - 20), WEATHER_CODE_SYMBOLS[entry["significantWeatherCode"]], fill=(255, 255, 255), font=symbol_font, anchor="ms")
+            draw.text(((index + 0.5) * 37, startingYPos - 20), WEATHER_CODE_SYMBOLS[entry["significantWeatherCode"]], fill=COLOR_PALETTE["WHITE"], font=symbol_font, anchor="ms")
 
             # Drawing time
-            draw.text(((index + 0.5) * 37, startingYPos - 5), timeString, fill=(255, 255, 255), font=small_lato_font_regular, anchor="ms")
+            draw.text(((index + 0.5) * 37, startingYPos - 5), timeString, fill=COLOR_PALETTE["WHITE"], font=small_lato_font_regular, anchor="ms")
 
             # Increasing index
             index += 1
@@ -177,25 +177,21 @@ def DrawWindow(draw, API_KEY, startingYPos):
         maxTemp = max(maxTemp, entry["screenTemperature"])
         minTemp = min(minTemp, entry["screenTemperature"])
 
-    # Drawing a box for the temp graph
+    # Calculating the height of the graph
     tempGraphHeight = max(maxGraphTemp - minGraphTemp, 5)
-    draw.rectangle(
-        (20, startingYPos - 160, 460, startingYPos - 60),
-        fill=(80, 118, 212)
-    )
 
     # Drawing incremental lines for each integer degree value
     degrees = int(round(maxGraphTemp) - round(minGraphTemp))
     degreeOffset = 100 / float(degrees)
     for i in range(degrees):
         lineYPos = startingYPos - 60 - (i * degreeOffset)
-        draw.line((20, lineYPos, 460, lineYPos), fill=(37, 73, 161), width=1)
+        draw.line((20, lineYPos, 460, lineYPos), fill=COLOR_PALETTE["BLACK"], width=1)
 
     # Drawing lines and labels for the top and bottom lines
-    draw.text((18, startingYPos - 60), str(round(minGraphTemp)), fill=(255, 255, 255), font=small_lato_font_regular, anchor="rb")
-    draw.text((18, startingYPos - 160), str(round(maxGraphTemp)), fill=(255, 255, 255), font=small_lato_font_regular, anchor="rt")
-    draw.line((20, startingYPos - 60, 460, startingYPos - 60), fill=(255, 255, 255), width=2)
-    draw.line((20, startingYPos - 160, 460, startingYPos - 160), fill=(255, 255, 255), width=2)
+    draw.text((18, startingYPos - 60), str(round(minGraphTemp)), fill=COLOR_PALETTE["WHITE"], font=small_lato_font_regular, anchor="rb")
+    draw.text((18, startingYPos - 160), str(round(maxGraphTemp)), fill=COLOR_PALETTE["WHITE"], font=small_lato_font_regular, anchor="rt")
+    draw.line((20, startingYPos - 60, 460, startingYPos - 60), fill=COLOR_PALETTE["WHITE"], width=2)
+    draw.line((20, startingYPos - 160, 460, startingYPos - 160), fill=COLOR_PALETTE["WHITE"], width=2)
 
     # Looping through the temp data points and drawing a graph
     for i in range(len(actualTempPoints) - 1):
@@ -208,8 +204,8 @@ def DrawWindow(draw, API_KEY, startingYPos):
         feelsLikeTempLineEnd = ((i + 1) * 18.333 + 20, (feelsLikeTempPoints[i + 1] - minGraphTemp) / tempGraphHeight * -90 + startingYPos - 65)
 
         # Drawing a line from point i to i + 1
-        draw.line((feelsLikeTempLineStart, feelsLikeTempLineEnd), fill=(200, 200, 200), width=3)
-        draw.line((actualTempLineStart, actualTempLineEnd), fill=(255, 255, 255), width=3)
+        draw.line((feelsLikeTempLineStart, feelsLikeTempLineEnd), fill=COLOR_PALETTE["LIGHT_GREY"], width=3)
+        draw.line((actualTempLineStart, actualTempLineEnd), fill=COLOR_PALETTE["WHITE"], width=3)
 
     # Getting daily weather info
     BASE_URL = "https://data.hub.api.metoffice.gov.uk/sitespecific/v0/point/daily"
@@ -246,8 +242,8 @@ def DrawWindow(draw, API_KEY, startingYPos):
         # Drawing temp ranges
         tempRange = f"{round(weatherToday["dayUpperBoundMaxTemp"])}°C / {round(weatherToday["nightLowerBoundMinTemp"])}°C" 
         feelsLikeTempRange = f"{round(weatherToday["dayUpperBoundMaxFeelsLikeTemp"])}°C / {round(weatherToday["nightLowerBoundMinFeelsLikeTemp"])}°C" 
-        draw.text((240, startingYPos - (200 + 5)), tempRange, fill=(255, 255, 255), font=large_lato_font_regular, anchor="mb")
-        draw.text((240, startingYPos - (200 - 3)), feelsLikeTempRange, fill=(200, 200, 200), font=medium_lato_font_regular, anchor="mt")
+        draw.text((240, startingYPos - (200 + 5)), tempRange, fill=COLOR_PALETTE["WHITE"], font=large_lato_font_regular, anchor="mb")
+        draw.text((240, startingYPos - (200 - 3)), feelsLikeTempRange, fill=COLOR_PALETTE["LIGHT_GREY"], font=medium_lato_font_regular, anchor="mt")
 
         # Drawing chance of rain
         rainIcons = [
@@ -258,17 +254,17 @@ def DrawWindow(draw, API_KEY, startingYPos):
         ]
         rainChance = f"{weatherToday["dayProbabilityOfPrecipitation"]}%"
         rainIconIndex = round((weatherToday["dayProbabilityOfPrecipitation"] / 25))
-        draw.text((80, startingYPos - (200 + 3)), rainIcons[rainIconIndex], fill=(255, 255, 255), font=large_symbol_font, anchor="mb")
-        draw.text((80, startingYPos - (200 - 3)), rainChance, fill=(200, 200, 200), font=medium_lato_font_regular, anchor="mt")
+        draw.text((80, startingYPos - (200 + 3)), rainIcons[rainIconIndex], fill=COLOR_PALETTE["WHITE"], font=large_symbol_font, anchor="mb")
+        draw.text((80, startingYPos - (200 - 3)), rainChance, fill=COLOR_PALETTE["LIGHT_GREY"], font=medium_lato_font_regular, anchor="mt")
 
         # Drawing wind speeds
         windSpeeds = f"{weatherToday["midday10MWindSpeed"]}"
-        draw.text((400, startingYPos - (200 - 3)), "", fill=(255, 255, 255), font=large_symbol_font, anchor="mb")
-        draw.text((400, startingYPos - (200 - 3)), windSpeeds, fill=(200, 200, 200), font=medium_lato_font_regular, anchor="mt")
+        draw.text((400, startingYPos - (200 - 3)), "", fill=COLOR_PALETTE["WHITE"], font=large_symbol_font, anchor="mb")
+        draw.text((400, startingYPos - (200 - 3)), windSpeeds, fill=COLOR_PALETTE["LIGHT_GREY"], font=medium_lato_font_regular, anchor="mt")
 
         # Drawing day at the top
         dateText = dundeeTime.strftime("%A, %B %#d, %Y")
-        draw.text((240, startingYPos - 282), dateText, fill=(255, 255, 255), font=medium_lato_font_regular, anchor="mt")
+        draw.text((240, startingYPos - 282), dateText, fill=COLOR_PALETTE["WHITE"], font=medium_lato_font_regular, anchor="mt")
         
     except requests.exceptions.requests.HTTPError as http_err:
         print(f"HTTP error occurred: {http_err}")
