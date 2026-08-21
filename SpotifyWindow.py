@@ -36,7 +36,6 @@ def DrawWindow(displayImage, draw, COLOR_PALETTE, API_TOKEN, startingYPos):
     for release in possibleReleases:
         if (release["release"]["weight"] > todaysRelease["release"]["weight"]):
             todaysRelease = release
-    todaysRelease = possibleReleases[1]
 
     # Getting info on the release form the spotify API
     BASE_URL = f"https://api.spotify.com/v1/albums/{todaysRelease["release"]["release_id"]}?locale=en-US"
@@ -65,23 +64,18 @@ def DrawWindow(displayImage, draw, COLOR_PALETTE, API_TOKEN, startingYPos):
     releaseImage = releaseImage.resize((180, 180))
     releaseImage = releaseImage.convert("RGBA")
 
-    # Draw the background
-    draw.rectangle(
-        (0, startingYPos - 250, 480, startingYPos),
-        fill=COLOR_PALETTE["GREEN"])
-
     # Drawing the release title to the screen
-    draw.text((10, startingYPos - 240), f"Released {yearsAgo} years ago,", fill=COLOR_PALETTE["WHITE"], font=medium_lato_font_regular, anchor="lt")
-    draw.text((10, startingYPos - 219), releaseName, fill=COLOR_PALETTE["WHITE"], font=medium_lato_font_bold, anchor="lt")
+    draw.text((10, startingYPos - 240), f"Released {yearsAgo} years ago,", fill=COLOR_PALETTE["BLACK"], font=medium_lato_font_regular, anchor="lt")
+    draw.text((10, startingYPos - 219), releaseName, fill=COLOR_PALETTE["BLACK"], font=medium_lato_font_bold, anchor="lt")
     
     # Drawing the outline and the image
-    draw.rectangle((8, startingYPos - 192, 191, startingYPos - 9), fill=COLOR_PALETTE["WHITE"])
+    draw.rectangle((8, startingYPos - 192, 191, startingYPos - 9), fill=COLOR_PALETTE["BLACK"])
     displayImage.paste(releaseImage, (10, startingYPos - 190))
 
     # Drawing some release info
-    draw.text((195, startingYPos - 190), f"Artist: {artistName}",    fill=COLOR_PALETTE["WHITE"], font=small_lato_font_regular, anchor="lt")
-    draw.text((195, startingYPos - 175), f"Released: {releaseDate}", fill=COLOR_PALETTE["WHITE"], font=small_lato_font_regular, anchor="lt")
-    draw.text((195, startingYPos - 160), f"Tracks:", fill=COLOR_PALETTE["WHITE"],                 font=small_lato_font_regular, anchor="lt")
+    draw.text((195, startingYPos - 190), f"Artist: {artistName}",    fill=COLOR_PALETTE["BLACK"], font=small_lato_font_regular, anchor="lt")
+    draw.text((195, startingYPos - 175), f"Released: {releaseDate}", fill=COLOR_PALETTE["BLACK"], font=small_lato_font_regular, anchor="lt")
+    draw.text((195, startingYPos - 160), f"Tracks:", fill=COLOR_PALETTE["BLACK"],                 font=small_lato_font_regular, anchor="lt")
 
     # Drawing info on each of the tracks of the release (max 8)
     releaseTracks = releaseResult["tracks"]["items"]
@@ -91,8 +85,8 @@ def DrawWindow(displayImage, draw, COLOR_PALETTE, API_TOKEN, startingYPos):
 
         # Checking if the max index has been reached
         if (index > 8 and len(releaseTracks) > 8):
-            draw.text((205, yPos + 2), "...", fill=COLOR_PALETTE["WHITE"], font=small_lato_font_regular, anchor="lt")
+            draw.text((205, yPos + 2), "...", fill=COLOR_PALETTE["BLACK"], font=small_lato_font_regular, anchor="lt")
             break
 
         # Drawing the track
-        draw.text((205, yPos), f"-{track["name"]}", fill=COLOR_PALETTE["WHITE"], font=small_lato_font_regular, anchor="lt")
+        draw.text((205, yPos), f"-{track["name"]}", fill=COLOR_PALETTE["BLACK"], font=small_lato_font_regular, anchor="lt")

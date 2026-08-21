@@ -30,6 +30,8 @@ try:
         "YELLOW": inky_display.YELLOW,
         "ORANGE": inky_display.ORANGE,
         "LIGHT_GREY": (200, 200, 200),
+        "GREY": (122, 122, 122),
+        "GOLD": (194, 156, 50),
     }
 except:
     COLOR_PALETTE = {
@@ -42,6 +44,9 @@ except:
         "ORANGE": (255, 140, 0),
         "ORANGE": (255, 140, 0),
         "LIGHT_GREY": (200, 200, 200),
+        "GREY": (125, 125, 125),
+        "DARK_GREY": (75, 75, 75),
+        "GOLD": (194, 156, 50),
     }
 
 # Creating image and drawing device
@@ -94,15 +99,19 @@ SPOTIFY_TOKEN = getToken()
 # Calling the different window functions
 #WeatherWindow.DrawWindow(draw, COLOR_PALETTE, WEATHER_API_KEY, 300)
 #print("Draw Weather Window")
-#SpotifyWindow.DrawWindow(image, draw, COLOR_PALETTE, SPOTIFY_TOKEN, 550)
-#print("Draw Spotify Window")
-ArtWindow.DrawWindow(image, draw, 800)
+ArtWindow.DrawWindow(image, draw, COLOR_PALETTE, 300)
 print("Draw Art Window") 
+SpotifyWindow.DrawWindow(image, draw, COLOR_PALETTE, SPOTIFY_TOKEN, 550)
+print("Draw Spotify Window")
+
+# Drawing lines between the different windows
+draw.line((10, 300, 470, 300), fill=COLOR_PALETTE["BLACK"], width=2)
+draw.line((10, 550, 470, 550), fill=COLOR_PALETTE["BLACK"], width=2)
 
 # Saving the image
 image.save("displayImage.png")
 
-#Inky stuff
+# Inky stuff
 try:
     # Rotating the image to fit the display
     inkyImage = Image.new("P", (inky_display.width, inky_display.height), inky_display.WHITE)
