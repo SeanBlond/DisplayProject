@@ -95,4 +95,4 @@ def DrawWindow(displayImage, draw, COLOR_PALETTE, API_TOKEN, startingYPos):
             break
 
         # Drawing the track
-        draw.text((205, yPos), track["name"], fill=COLOR_PALETTE["WHITE"], font=small_lato_font_regular, anchor="lt")
+        draw.text((205, yPos), f"-{track["name"]}", fill=COLOR_PALETTE["WHITE"], font=small_lato_font_regular, anchor="lt")

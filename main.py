@@ -1,6 +1,6 @@
 from PIL import Image, ImageDraw, ImageFont
 import WeatherWindow
-#import ArtWindow
+import ArtWindow
 import SpotifyWindow
 from dotenv import load_dotenv
 import base64
@@ -92,11 +92,12 @@ def getToken():
 SPOTIFY_TOKEN = getToken()
 
 # Calling the different window functions
-WeatherWindow.DrawWindow(draw, COLOR_PALETTE, WEATHER_API_KEY, 300)
-print("Draw Weather Window")
-SpotifyWindow.DrawWindow(image, draw, COLOR_PALETTE, SPOTIFY_TOKEN, 550)
-print("Draw Spotify Window")
-#ArtWindow.DrawWindow(draw, 550)
+#WeatherWindow.DrawWindow(draw, COLOR_PALETTE, WEATHER_API_KEY, 300)
+#print("Draw Weather Window")
+#SpotifyWindow.DrawWindow(image, draw, COLOR_PALETTE, SPOTIFY_TOKEN, 550)
+#print("Draw Spotify Window")
+ArtWindow.DrawWindow(image, draw, 800)
+print("Draw Art Window") 
 
 # Saving the image
 image.save("displayImage.png")
