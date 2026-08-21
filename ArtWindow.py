@@ -57,6 +57,7 @@ def getArtImage(artID, urlBase, width=0, height=0):
 
     except:
         print("Failed to download the image file.")
+        print(f"Status Code: {response.status_code}")
         return
 
 def DrawWindow(displayImage, draw, COLOR_PALETTE, startingYPos):

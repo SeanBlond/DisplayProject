@@ -97,10 +97,10 @@ def getToken():
 SPOTIFY_TOKEN = getToken()
 
 # Calling the different window functions
-#WeatherWindow.DrawWindow(draw, COLOR_PALETTE, WEATHER_API_KEY, 300)
-#print("Draw Weather Window")
-ArtWindow.DrawWindow(image, draw, COLOR_PALETTE, 300)
-print("Draw Art Window") 
+WeatherWindow.DrawWindow(draw, COLOR_PALETTE, WEATHER_API_KEY, 300)
+print("Draw Weather Window")
+#ArtWindow.DrawWindow(image, draw, COLOR_PALETTE, 300)
+#print("Draw Art Window") 
 SpotifyWindow.DrawWindow(image, draw, COLOR_PALETTE, SPOTIFY_TOKEN, 550)
 print("Draw Spotify Window")
 
