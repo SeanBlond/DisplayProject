@@ -36,8 +36,8 @@ except:
         "BLACK": (0, 0, 0),
         "WHITE": (255, 255, 255),
         "RED": (255, 0, 0),
-        "GREEN": (0, 255, 0),
-        "BLUE": (0, 0, 255),
+        "GREEN": (12, 92, 12),
+        "BLUE": (47, 47, 181),
         "YELLOW": (255, 255, 0),
         "ORANGE": (255, 140, 0),
         "ORANGE": (255, 140, 0),
@@ -93,8 +93,10 @@ SPOTIFY_TOKEN = getToken()
 
 # Calling the different window functions
 WeatherWindow.DrawWindow(draw, COLOR_PALETTE, WEATHER_API_KEY, 300)
-#ArtWindow.DrawWindow(draw, 550)
+print("Draw Weather Window")
 SpotifyWindow.DrawWindow(image, draw, COLOR_PALETTE, SPOTIFY_TOKEN, 550)
+print("Draw Spotify Window")
+#ArtWindow.DrawWindow(draw, 550)
 
 # Saving the image
 image.save("displayImage.png")
@@ -109,4 +111,4 @@ try:
     inky_display.set_image(rotImage)
     inky_display.show()
 except:
-    print("Failed to run inky functions")
+    print("Failed to run Inky functions")

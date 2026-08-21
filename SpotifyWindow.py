@@ -7,7 +7,7 @@ import json
 def DrawWindow(displayImage, draw, COLOR_PALETTE, API_TOKEN, startingYPos):
     # Loading fonts
     try:
-        small_lato_font_regular = ImageFont.truetype("Lato/Lato-Regular.ttf", size=13)
+        small_lato_font_regular = ImageFont.truetype("Lato/Lato-Bold.ttf", size=13)
         medium_lato_font_regular = ImageFont.truetype("Lato/Lato-Regular.ttf", size=20)
         medium_lato_font_bold = ImageFont.truetype("Lato/Lato-Bold.ttf", size=25)
     except IOError:
@@ -40,7 +40,6 @@ def DrawWindow(displayImage, draw, COLOR_PALETTE, API_TOKEN, startingYPos):
 
     # Getting info on the release form the spotify API
     BASE_URL = f"https://api.spotify.com/v1/albums/{todaysRelease["release"]["release_id"]}?locale=en-US"
-    BASE_URL = f"https://api.spotify.com/v1/albums/{"2uzzzHSiVpxwo8H4UEwmZx"}?locale=en-US"
 
     # Requesting the data
     response = requests.get(BASE_URL, headers=getAuthHeader(API_TOKEN))
