@@ -4,7 +4,7 @@ from zoneinfo import ZoneInfo
 import requests
 import sys
 
-def DrawWeatherGraph(draw, API_KEY, startingYPos):
+def DrawWindow(draw, API_KEY, startingYPos):
     # Loading fonts
     try:
         small_lato_font_regular = ImageFont.truetype("Lato/Lato-Regular.ttf", size=15)

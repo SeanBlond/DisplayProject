@@ -2,3 +2,5 @@ api_key
 /.vs
 readout
 .env
+/__pycache__
+displayImage.png
