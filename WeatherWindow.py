@@ -4,6 +4,22 @@ from zoneinfo import ZoneInfo
 import requests
 import sys
 
+def lerp(a, b, t):
+    return t * a + (1 - t) * b;
+
+def smoothValueBetween(a, b, t):
+    t = pow(t, 2) * (-2 * t + 3)
+    return lerp(a, b, t)
+
+def drawSmoothLine(draw, startPoint, endPoint, fill, width, segments=2):
+    for i in range(segments):
+        startXPos = lerp(startPoint[0], endPoint[0], float(i / segments))
+        startYPos = smoothValueBetween(startPoint[1], endPoint[1], float(i / segments))
+        endXPos = lerp(startPoint[0], endPoint[0], float((i + 1) / segments))
+        endYPos = smoothValueBetween(startPoint[1], endPoint[1], float((i + 1) / segments))
+
+        draw.line((startXPos, startYPos, endXPos, endYPos), fill, width)
+
 def DrawWindow(draw, COLOR_PALETTE, API_KEY, startingYPos):
     # Loading fonts
     try:
@@ -73,7 +89,7 @@ def DrawWindow(draw, COLOR_PALETTE, API_KEY, startingYPos):
         draw.text((80, startingYPos - (200 - 3)), rainChance, fill=COLOR_PALETTE["LIGHT_GREY"], font=medium_lato_font_regular, anchor="mt")
 
         # Drawing wind speeds
-        windSpeeds = f"{weatherToday["midday10MWindSpeed"]}"
+        windSpeeds = f"{round(weatherToday["midday10MWindSpeed"] * 3.6)}kmh"
         draw.text((400, startingYPos - (200 - 3)), "", fill=COLOR_PALETTE["BLACK"], font=large_symbol_font, anchor="mb")
         draw.text((400, startingYPos - (200 - 3)), windSpeeds, fill=COLOR_PALETTE["LIGHT_GREY"], font=medium_lato_font_regular, anchor="mt")
 
@@ -241,12 +257,6 @@ def DrawWindow(draw, COLOR_PALETTE, API_KEY, startingYPos):
         lineYPos = startingYPos - 60 - (i * degreeOffset)
         draw.line((20, lineYPos, 460, lineYPos), fill=COLOR_PALETTE["BLACK"], width=1)
 
-    # Drawing lines and labels for the top and bottom lines
-    draw.text((18, startingYPos - 60), str(round(tempGraphMin)), fill=COLOR_PALETTE["BLACK"], font=small_lato_font_regular, anchor="rb")
-    draw.text((18, startingYPos - 160), str(round(tempGraphMax)), fill=COLOR_PALETTE["BLACK"], font=small_lato_font_regular, anchor="rt")
-    draw.line((20, startingYPos - 60, 460, startingYPos - 60), fill=COLOR_PALETTE["BLACK"], width=2)
-    draw.line((20, startingYPos - 160, 460, startingYPos - 160), fill=COLOR_PALETTE["BLACK"], width=2)
-
     # Looping through the temp data points and drawing a graph
     for i in range(len(actualTempPoints) - 1):
         # Calculating the line coords for the actual temperature
@@ -258,5 +268,11 @@ def DrawWindow(draw, COLOR_PALETTE, API_KEY, startingYPos):
         feelsLikeTempLineEnd = ((i + 1) * 18.333 + 20, (feelsLikeTempPoints[i + 1] - tempGraphMin) / tempGraphHeight * -90 + startingYPos - 65)
 
         # Drawing a line from point i to i + 1
-        draw.line((feelsLikeTempLineStart, feelsLikeTempLineEnd), fill=COLOR_PALETTE["LIGHT_GREY"], width=3)
-        draw.line((actualTempLineStart, actualTempLineEnd), fill=COLOR_PALETTE["BLACK"], width=3)
+        drawSmoothLine(draw, feelsLikeTempLineStart, feelsLikeTempLineEnd, fill=COLOR_PALETTE["LIGHT_GREY"], width=3)
+        drawSmoothLine(draw, actualTempLineStart, actualTempLineEnd, fill=COLOR_PALETTE["BLACK"], width=3)
+
+    # Drawing lines and labels for the top and bottom lines
+    draw.text((18, startingYPos - 60), str(round(tempGraphMin)), fill=COLOR_PALETTE["BLACK"], font=small_lato_font_regular, anchor="rb")
+    draw.text((18, startingYPos - 160), str(round(tempGraphMax)), fill=COLOR_PALETTE["BLACK"], font=small_lato_font_regular, anchor="rt")
+    draw.line((20, startingYPos - 60, 460, startingYPos - 60), fill=COLOR_PALETTE["BLACK"], width=2)
+    draw.line((20, startingYPos - 160, 460, startingYPos - 160), fill=COLOR_PALETTE["BLACK"], width=2)

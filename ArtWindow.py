@@ -45,7 +45,7 @@ def getArtImage(artID, urlBase, width=0, height=0):
 
     # Getting the image
     try:
-        #Requesting the image url
+        # Requesting the image url
         response = requests.get(IMAGE_URL, headers=headers, timeout=2)
 
         # Checking if the request was succesful
