@@ -1,10 +1,34 @@
 from PIL import Image, ImageDraw, ImageFont
-from datetime import datetime
+from datetime import datetime, timedelta
 from io import BytesIO
 import requests
 import json
 
-def DrawWindow(displayImage, draw, COLOR_PALETTE, API_TOKEN, startingYPos):
+def getAlbumFromID(id, authHeader):
+    # Getting info on the release form the spotify API
+    BASE_URL = f"https://api.spotify.com/v1/albums/{id}?locale=en-US"
+
+    # Requesting the data
+    response = requests.get(BASE_URL, headers=authHeader)
+
+    if response.status_code == 429:
+        # Get the header (default to 5 seconds if not found)
+        retry_after = int(response.headers.get("Retry-After", 5))
+        print(f"Rate limited! Waiting for {retry_after} seconds.")
+        return
+
+    return json.loads(response.content)
+
+def getImageFromURL(imageURL, size):
+    # Getting the image
+    imageURLResposne = requests.get(imageURL)
+    image = Image.open(BytesIO(imageURLResposne.content))
+    image = image.resize(size)
+    image = image.convert("RGBA")
+
+    return image
+
+def DrawSingleWindow(displayImage, draw, COLOR_PALETTE, API_TOKEN, startingYPos):
     # Loading fonts
     try:
         small_lato_font_regular = ImageFont.truetype("Lato/Lato-Bold.ttf", size=13)
@@ -15,7 +39,7 @@ def DrawWindow(displayImage, draw, COLOR_PALETTE, API_TOKEN, startingYPos):
         medium_lato_font_regular = ImageFont.load_default()
         medium_lato_font_bold = ImageFont.load_default()
 
-    
+
     # Defining function for getting the authorisation header
     def getAuthHeader(token):
         return {"Authorization": "Bearer " + token}
@@ -37,20 +61,10 @@ def DrawWindow(displayImage, draw, COLOR_PALETTE, API_TOKEN, startingYPos):
         if (release["release"]["weight"] > todaysRelease["release"]["weight"]):
             todaysRelease = release
 
-    # Getting info on the release form the spotify API
-    BASE_URL = f"https://api.spotify.com/v1/albums/{todaysRelease["release"]["release_id"]}?locale=en-US"
+    # Getting the album from the Spotify API
+    releaseResult = getAlbumFromID(todaysRelease["release"]["release_id"], getAuthHeader(API_TOKEN))
 
-    # Requesting the data
-    response = requests.get(BASE_URL, headers=getAuthHeader(API_TOKEN))
-    
-    if response.status_code == 429:
-        # Get the header (default to 5 seconds if not found)
-        retry_after = int(response.headers.get("Retry-After", 5))
-        print(f"Rate limited! Waiting for {retry_after} seconds.")
-        return
-    
-    # Loading the data for the output
-    releaseResult = json.loads(response.content)
+    # Getting release info
     yearsAgo = todaysDate.year - todaysRelease["release"]["release_year"]
     releaseName = releaseResult["name"]
     artistName = releaseResult["artists"][0]["name"]
@@ -58,16 +72,12 @@ def DrawWindow(displayImage, draw, COLOR_PALETTE, API_TOKEN, startingYPos):
     releaseType = releaseResult["album_type"].capitalize()
 
     # Getting the image
-    releaseImageURL = releaseResult["images"][0]["url"]
-    releaseImageURLResposne = requests.get(releaseImageURL)
-    releaseImage = Image.open(BytesIO(releaseImageURLResposne.content))
-    releaseImage = releaseImage.resize((180, 180))
-    releaseImage = releaseImage.convert("RGBA")
+    releaseImage = getImageFromURL(releaseResult["images"][0]["url"], (180, 180))
 
     # Drawing the release title to the screen
     draw.text((10, startingYPos - 240), f"Released {yearsAgo} years ago,", fill=COLOR_PALETTE["BLACK"], font=medium_lato_font_regular, anchor="lt")
     draw.text((10, startingYPos - 219), releaseName, fill=COLOR_PALETTE["BLACK"], font=medium_lato_font_bold, anchor="lt")
-    
+
     # Drawing the outline and the image
     draw.rectangle((8, startingYPos - 192, 191, startingYPos - 9), fill=COLOR_PALETTE["BLACK"])
     displayImage.paste(releaseImage, (10, startingYPos - 190))
@@ -90,3 +100,64 @@ def DrawWindow(displayImage, draw, COLOR_PALETTE, API_TOKEN, startingYPos):
 
         # Drawing the track
         draw.text((205, yPos), f"-{track["name"]}", fill=COLOR_PALETTE["BLACK"], font=small_lato_font_regular, anchor="lt")
+
+def DrawMultiWindow(displayImage, draw, COLOR_PALETTE, API_TOKEN, startingYPos):
+    # Loading fonts
+    try:
+        small_lato_font_regular = ImageFont.truetype("Lato/Lato-Regular.ttf", size=13)
+    except IOError:
+        small_lato_font_regular = ImageFont.load_default()
+
+    # Defining function for getting the authorisation header
+    def getAuthHeader(token):
+        return {"Authorization": "Bearer " + token}
+
+    # Getting the current date
+    todaysDate = datetime.now()
+
+    # Getting release data from the json file
+    with open('releaseCalendar.json', 'r', encoding='utf-8') as file:
+        possibleReleases = json.load(file)[todaysDate.strftime("%m-%d")]
+
+    if len(possibleReleases) == 0:
+        print("No releases on todays date :(")
+        return
+
+    # Getting a list of the releases to display today
+    todaysReleases = [possibleReleases[0]]
+    for possibleRelease in possibleReleases[1:]:
+        foundSpot = False
+        for index, comparativeRelease in enumerate(todaysReleases):
+            if possibleRelease["release"]["weight"] > comparativeRelease["release"]["weight"]:
+                todaysReleases.insert(index, possibleRelease)
+                foundSpot = True
+                break
+
+        if not foundSpot:
+            todaysReleases.append(possibleRelease)
+
+
+    # Looping through each possible release and displaying it to the image
+    amountOfReleases = min(len(todaysReleases), 8)
+    for i in range(amountOfReleases):
+        # Defining drawing positions
+        yPos = startingYPos - 250 + (int(i / 4) * 125) + 5 + (60 if amountOfReleases <= 4 else 0)
+        if i < 4:
+            amountInRow = 4 if amountOfReleases > 4 else amountOfReleases
+        else:
+            amountInRow = amountOfReleases - (4 * int(i / 4))
+        xOffset = -58 * amountInRow + 248
+        xPos = (i % 4 * 100) + (i % 4 * 16) + xOffset
+
+        # Getting the album from the Spotify API
+        releaseResult = getAlbumFromID(todaysReleases[i]["release"]["release_id"], getAuthHeader(API_TOKEN))
+
+        # Getting release info
+        artistName = releaseResult["artists"][0]["name"]
+
+        # Getting the image
+        releaseImage = getImageFromURL(releaseResult["images"][0]["url"], (100, 100))
+
+        # Drawing info to the screen
+        displayImage.paste(releaseImage, (int(xPos), int(yPos)))
+        draw.text((xPos + 50, yPos + 105), artistName, fill=COLOR_PALETTE["BLACK"], font=small_lato_font_regular, anchor="mt")

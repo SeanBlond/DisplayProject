@@ -1,0 +1,117 @@
+[
+  {
+    'release': {
+      'release_id': '2uzzzHSiVpxwo8H4UEwmZx',
+      'release_year': 2025,
+      'weight': 10
+    }
+  },
+  {
+    'release': {
+      'release_id': '51i8dJfts9KYLmGM6ozmRu',
+      'release_year': 2018,
+      'weight': 6
+    }
+  },
+  {
+    'release': {
+      'release_id': '2ff2KgbhuIhLPCN2MVf5zW',
+      'release_year': 2022,
+      'weight': 6
+    }
+  },
+  {
+    'release': {
+      'release_id': '0pa8KPeh6xvt2NGJIoSRPL',
+      'release_year': 2021,
+      'weight': 9
+    }
+  },
+  {
+    'release': {
+      'release_id': '2cHkvXg2VD3N7XI9tLdiWR',
+      'release_year': 2001,
+      'weight': 8
+    }
+  },
+  {
+    'release': {
+      'release_id': '3d074CbXfMHxShY93vGjtf',
+      'release_year': 2019,
+      'weight': 5
+    }
+  },
+  {
+    'release': {
+      'release_id': '4fKD3cCY0jrfu7150ByNAx',
+      'release_year': 2021,
+      'weight': 5
+    }
+  },
+  {
+    'release': {
+      'release_id': '5Ytl4luzTdstrEpZdlMCSk',
+      'release_year': 2016,
+      'weight': 8
+    }
+  }
+]
+
+[
+  {
+    'release': {
+      'release_id': '2uzzzHSiVpxwo8H4UEwmZx',
+      'release_year': 2025,
+      'weight': 10
+    }
+  },
+  {
+    'release': {
+      'release_id': '0pa8KPeh6xvt2NGJIoSRPL',
+      'release_year': 2021,
+      'weight': 9
+    }
+  },
+  {
+    'release': {
+      'release_id': '2cHkvXg2VD3N7XI9tLdiWR',
+      'release_year': 2001,
+      'weight': 8
+    }
+  },
+  {
+    'release': {
+      'release_id': '5Ytl4luzTdstrEpZdlMCSk',
+      'release_year': 2016,
+      'weight': 8
+    }
+  },
+  {
+    'release': {
+      'release_id': '51i8dJfts9KYLmGM6ozmRu',
+      'release_year': 2018,
+      'weight': 6
+    }
+  },
+  {
+    'release': {
+      'release_id': '2ff2KgbhuIhLPCN2MVf5zW',
+      'release_year': 2022,
+      'weight': 6
+    }
+  },
+  {
+    'release': {
+      'release_id': '3d074CbXfMHxShY93vGjtf',
+      'release_year': 2019,
+      'weight': 5
+    }
+  },
+  {
+    'release': {
+      'release_id': '4fKD3cCY0jrfu7150ByNAx',
+      'release_year': 2021,
+      'weight': 5
+    }
+  }
+]

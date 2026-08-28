@@ -42,7 +42,6 @@ except:
         "BLUE": (47, 47, 181),
         "YELLOW": (255, 255, 0),
         "ORANGE": (255, 140, 0),
-        "ORANGE": (255, 140, 0),
         "LIGHT_GREY": (200, 200, 200),
         "GREY": (125, 125, 125),
         "DARK_GREY": (75, 75, 75),
@@ -100,11 +99,11 @@ SPOTIFY_TOKEN = getToken()
 print("Draw Weather Window")
 WeatherWindow.DrawWindow(draw, COLOR_PALETTE, WEATHER_API_KEY, 300)
 #ArtWindow.DrawWindow(image, draw, COLOR_PALETTE, 300)
-#print("Draw Art Window") 
+#print("Draw Art Window")
 SpotifyWindow.DrawSingleWindow(image, draw, COLOR_PALETTE, SPOTIFY_TOKEN, 550)
-print("Draw Spotify Daily Window")
-#SpotifyWindow.DrawMultiWindow(image, draw, COLOR_PALETTE, SPOTIFY_TOKEN, 800)
-#print("Draw Spotify Daily Window")
+print("Draw Spotify Single Window")
+SpotifyWindow.DrawMultiWindow(image, draw, COLOR_PALETTE, SPOTIFY_TOKEN, 800)
+print("Draw Spotify Multi Window")
 
 # Drawing lines between the different windows
 draw.line((10, 300, 470, 300), fill=COLOR_PALETTE["BLACK"], width=2)
