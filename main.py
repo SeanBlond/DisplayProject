@@ -102,6 +102,8 @@ WeatherWindow.DrawWindow(draw, COLOR_PALETTE, WEATHER_API_KEY, 300)
 #print("Draw Art Window")
 SpotifyWindow.DrawSingleWindow(image, draw, COLOR_PALETTE, SPOTIFY_TOKEN, 550)
 print("Draw Spotify Single Window")
+#SpotifyWindow.DrawRandomSingleWindow(image, draw, COLOR_PALETTE, SPOTIFY_TOKEN, 550)
+#print("Draw Spotify Single Window")
 SpotifyWindow.DrawMultiWindow(image, draw, COLOR_PALETTE, SPOTIFY_TOKEN, 800)
 print("Draw Spotify Multi Window")
 
