@@ -5,3 +5,5 @@ readout
 /__pycache__
 displayImage.png
 /.idea
+credentials.json
+token.json
