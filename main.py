@@ -1,5 +1,6 @@
 from PIL import Image, ImageDraw, ImageFont
 import WeatherWindow
+import CalendarWindow
 import ArtWindow
 import SpotifyWindow
 from dotenv import load_dotenv
@@ -100,12 +101,15 @@ print("Draw Weather Window")
 WeatherWindow.DrawWindow(draw, COLOR_PALETTE, WEATHER_API_KEY, 300)
 #ArtWindow.DrawWindow(image, draw, COLOR_PALETTE, 300)
 #print("Draw Art Window")
-SpotifyWindow.DrawSingleWindow(image, draw, COLOR_PALETTE, SPOTIFY_TOKEN, 550)
-print("Draw Spotify Single Window")
+
+CalendarWindow.DrawCalendarWindow(draw, COLOR_PALETTE, 550)
+
+#SpotifyWindow.DrawSingleWindow(image, draw, COLOR_PALETTE, SPOTIFY_TOKEN, 550)
+#print("Draw Spotify Single Window")
 #SpotifyWindow.DrawRandomSingleWindow(image, draw, COLOR_PALETTE, SPOTIFY_TOKEN, 550)
 #print("Draw Spotify Single Window")
-SpotifyWindow.DrawMultiWindow(image, draw, COLOR_PALETTE, SPOTIFY_TOKEN, 800)
-print("Draw Spotify Multi Window")
+#SpotifyWindow.DrawMultiWindow(image, draw, COLOR_PALETTE, SPOTIFY_TOKEN, 800)
+#print("Draw Spotify Multi Window")
 
 # Drawing lines between the different windows
 draw.line((10, 300, 470, 300), fill=COLOR_PALETTE["BLACK"], width=2)
