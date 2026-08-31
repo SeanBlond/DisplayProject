@@ -71,8 +71,8 @@ def DrawWindow(draw, COLOR_PALETTE, API_KEY, startingYPos):
                 break
 
         # Drawing temp ranges
-        tempRange = f"{round(weatherToday["dayUpperBoundMaxTemp"])}°C / {round(weatherToday["nightLowerBoundMinTemp"])}°C"
-        feelsLikeTempRange = f"{round(weatherToday["dayUpperBoundMaxFeelsLikeTemp"])}°C / {round(weatherToday["nightLowerBoundMinFeelsLikeTemp"])}°C" 
+        tempRange = f"{round(weatherToday["dayMaxScreenTemperature"])}°C / {round(weatherToday["nightMinScreenTemperature"])}°C"
+        feelsLikeTempRange = f"{round(weatherToday["dayMaxFeelsLikeTemp"])}°C / {round(weatherToday["nightMinFeelsLikeTemp"])}°C"
         draw.text((240, startingYPos - (200 + 5)), tempRange, fill=COLOR_PALETTE["BLACK"], font=large_lato_font_regular, anchor="mb")
         draw.text((240, startingYPos - (200 - 3)), feelsLikeTempRange, fill=COLOR_PALETTE["LIGHT_GREY"], font=medium_lato_font_regular, anchor="mt")
 
@@ -98,8 +98,8 @@ def DrawWindow(draw, COLOR_PALETTE, API_KEY, startingYPos):
         draw.text((240, startingYPos - 282), dateText, fill=COLOR_PALETTE["BLACK"], font=medium_lato_font_regular, anchor="mt")
         
         # Calculating the min and max temperature for the graph
-        tempGraphMin = min(weatherToday["nightLowerBoundMinFeelsLikeTemp"], weatherToday["nightMinScreenTemperature"])
-        tempGraphMax = max(weatherToday["dayUpperBoundMaxFeelsLikeTemp"], weatherToday["dayMaxScreenTemperature"])
+        tempGraphMin = min(weatherToday["nightMinFeelsLikeTemp"], weatherToday["nightMinScreenTemperature"])
+        tempGraphMax = max(weatherToday["dayMaxFeelsLikeTemp"], weatherToday["dayMaxScreenTemperature"])
 
     except requests.exceptions.requests.HTTPError as http_err:
         print(f"HTTP error occurred: {http_err}")
