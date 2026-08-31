@@ -125,7 +125,7 @@ def DrawMultiWindow(displayImage, draw, COLOR_PALETTE, API_TOKEN, startingYPos):
         return {"Authorization": "Bearer " + token}
 
     # Getting the current date
-    todaysDate = datetime.now() - timedelta(days=3)
+    todaysDate = datetime.now() + timedelta(days=1)
 
     # Getting release data from the json file
     with open('releaseCalendar.json', 'r', encoding='utf-8') as file:
