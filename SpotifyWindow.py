@@ -5,6 +5,17 @@ import random
 import requests
 import json
 
+MultiRowCounts = [
+    [1, 0], # 1 Release
+    [2, 0], # 2 Releases
+    [3, 0], # 3 Releases
+    [2, 2], # 4 Releases
+    [3, 2], # 5 Releases
+    [3, 3], # 6 Releases
+    [4, 3], # 7 Releases
+    [4, 4], # 8 Releases
+]
+
 def getAlbumFromID(id, authHeader):
     # Getting info on the release form the spotify API
     BASE_URL = f"https://api.spotify.com/v1/albums/{id}?locale=en-US"
@@ -114,7 +125,7 @@ def DrawMultiWindow(displayImage, draw, COLOR_PALETTE, API_TOKEN, startingYPos):
         return {"Authorization": "Bearer " + token}
 
     # Getting the current date
-    todaysDate = datetime.now()
+    todaysDate = datetime.now() - timedelta(days=3)
 
     # Getting release data from the json file
     with open('releaseCalendar.json', 'r', encoding='utf-8') as file:
@@ -140,18 +151,52 @@ def DrawMultiWindow(displayImage, draw, COLOR_PALETTE, API_TOKEN, startingYPos):
 
     # Looping through each possible release and displaying it to the image
     amountOfReleases = min(len(todaysReleases), 8)
-    for i in range(amountOfReleases):
+    print(MultiRowCounts[amountOfReleases - 1][0])
+    print(MultiRowCounts[amountOfReleases - 1][1])
+
+    # Drawing the first row
+    for i in range(MultiRowCounts[amountOfReleases - 1][0]):
+        # Deifning amount in row
+        amountInRow = MultiRowCounts[amountOfReleases - 1][0]
+
         # Defining drawing positions
-        yPos = startingYPos - 250 + (int(i / 4) * 125) + 5 + (60 if amountOfReleases <= 4 else 0)
-        if i < 4:
-            amountInRow = 4 if amountOfReleases > 4 else amountOfReleases
+        if (amountOfReleases <= 3):
+            imageSize = int(min(200, (480 - (amountInRow + 1) * 16) / amountInRow))
+            imagesWidth = int(imageSize * amountInRow + 16 * (amountInRow - 1))
+            yOffset = (250 - (imageSize + 25)) / 2
+            yPos = startingYPos - 250 + yOffset
+            xPos = ((480 - imagesWidth) / 2) + (i * imageSize) + (i * 16)
         else:
-            amountInRow = amountOfReleases - (4 * int(i / 4))
-        xOffset = -58 * amountInRow + 248
-        xPos = (i % 4 * 100) + (i % 4 * 16) + xOffset
+            imageSize = 100
+            yPos = startingYPos - 250 + 5
+            xOffset = -58 * amountInRow + 248
+            xPos = (i * 100) + (i * 16) + xOffset
 
         # Getting the album from the Spotify API
         releaseResult = getAlbumFromID(todaysReleases[i]["release"]["release_id"], getAuthHeader(API_TOKEN))
+
+        # Getting release info
+        artistName = releaseResult["artists"][0]["name"]
+
+        # Getting the image
+        releaseImage = getImageFromURL(releaseResult["images"][0]["url"], (imageSize, imageSize))
+
+        # Drawing info to the screen
+        displayImage.paste(releaseImage, (int(xPos), int(yPos)))
+        draw.text((xPos + imageSize / 2, yPos + imageSize + 5), artistName, fill=COLOR_PALETTE["BLACK"], font=small_lato_font_regular, anchor="mt")
+
+    # Drawing the second row
+    for i in range(MultiRowCounts[amountOfReleases - 1][1]):
+        # Deifning amount in row
+        amountInRow = MultiRowCounts[amountOfReleases - 1][1]
+
+        # Defining drawing positions
+        yPos = startingYPos - 250 + 5 + 120
+        xOffset = -58 * amountInRow + 248
+        xPos = (i * 100) + (i * 16) + xOffset
+
+        # Getting the album from the Spotify API
+        releaseResult = getAlbumFromID(todaysReleases[i + MultiRowCounts[amountOfReleases - 1][0]]["release"]["release_id"], getAuthHeader(API_TOKEN))
 
         # Getting release info
         artistName = releaseResult["artists"][0]["name"]
