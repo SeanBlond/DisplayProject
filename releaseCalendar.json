@@ -584,6 +584,52 @@
             }
         }
     ],
+    "12-12": [
+        {
+            "release": {
+                "release_id": "1CbtBQqibzdxhmpiLD7vzN",
+                "release_year": 2012,
+                "weight": 10
+            }
+        },
+        {
+            "release": {
+                "release_id": "1H0zYX6v90oPjTzPk6dx20",
+                "release_year": 2024,
+                "weight": 8
+            }
+        },
+        {
+            "release": {
+                "release_id": "7Jy7tOPi4W44e3VhPxLBos",
+                "release_year": 2018,
+                "weight": 5
+            }
+        },
+        {
+            "release": {
+                "release_id": "25qdbc4i4tl8hTgVMdYerE",
+                "release_year": 2025,
+                "weight": 7
+            }
+        }
+    ],
+    "09-11": [
+        {
+            "release": {
+                "release_id": "1ltMZOvl4Mcnl0J1eh1t7e",
+                "release_year": 2012,
+                "weight": 10
+            }
+        },
+        {
+            "release": {
+                "release_id": "5Zb0FlpCGrHQ4qHdME7XkC",
+                "release_year": 2007,
+                "weight": 8
+            }
+        }
+    ],
     "06-12": [
         {
             "release": {
@@ -4332,29 +4378,6 @@
             }
         }
     ],
-    "12-12": [
-        {
-            "release": {
-                "release_id": "1H0zYX6v90oPjTzPk6dx20",
-                "release_year": 2024,
-                "weight": 8
-            }
-        },
-        {
-            "release": {
-                "release_id": "7Jy7tOPi4W44e3VhPxLBos",
-                "release_year": 2018,
-                "weight": 5
-            }
-        },
-        {
-            "release": {
-                "release_id": "25qdbc4i4tl8hTgVMdYerE",
-                "release_year": 2025,
-                "weight": 7
-            }
-        }
-    ],
     "10-20": [
         {
             "release": {
@@ -5079,15 +5102,6 @@
                 "release_id": "2wFo8MHiILGeT4sH4GFDIn",
                 "release_year": 2024,
                 "weight": 5
-            }
-        }
-    ],
-    "09-11": [
-        {
-            "release": {
-                "release_id": "5Zb0FlpCGrHQ4qHdME7XkC",
-                "release_year": 2007,
-                "weight": 8
             }
         }
     ],

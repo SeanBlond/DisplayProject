@@ -94,7 +94,6 @@ def getAlbumsByArtist(token, artistID):
         # loading in each album
         for album in albumsInJson:
             albumObject = {"id": album["id"], "release_date": album["release_date"]}
-            print (albumObject)
             albumList.append(albumObject)
 
         # Increasing index
@@ -142,7 +141,8 @@ artists = [
     "3uwUtL5kPSO2mpOhU4SiWz",
     "4DiZJ3Gg7B1EWeKoQO36Ae",
     "07VKGw5BhunkwMnvz71Z1h",
-    "5YA1c6yVkPnflTLMfOgjzc"
+    "5YA1c6yVkPnflTLMfOgjzc",
+    "2FRXiAz5Uz78LLLSwEUhLt"
 ]
 
 exportJson = {}
